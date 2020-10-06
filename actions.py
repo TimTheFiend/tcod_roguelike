@@ -2,12 +2,14 @@ from __future__ import annotations
 
 from typing import Optional, Tuple, TYPE_CHECKING
 
+import color
+
 if TYPE_CHECKING:
     from engine import Engine
-    from entity import Entity
+    from entity import Actor, Entity
 
 class Action:
-    def __init__(self, entity: Entity):
+    def __init__(self, entity: Actor):
         super().__init__()
         self.entity = entity
 
@@ -16,7 +18,7 @@ class Action:
         """Return the engine this action belongs to."""
         return self.entity.gamemap.engine
 
-    def perform(self):
+    def perform(self) -> None:
         """Perform this action with the objects needed to determine its scope.
 
         `self.engine` is the scope being performed in.
@@ -28,11 +30,11 @@ class Action:
 
 
 class EscapeAction(Action):
-    def perform(self):
+    def perform(self) -> None:
         raise SystemExit(0)
 
 class ActionWithDirection(Action):
-    def __init__(self, entity: Entity, dx: int, dy: int):
+    def __init__(self, entity: Actor, dx: int, dy: int):
         super().__init__(entity)
         self.dx = dx
         self.dy = dy
@@ -43,8 +45,12 @@ class ActionWithDirection(Action):
         return self.entity.x + self.dx, self.entity.y + self.dy
 
     @property
-    def blocking_entity(self) -> Optional[Entity]:
-        return self.engine.game_map.get_blocking_entity_at_location(*self.dest_xy)
+    def blocking_entity(self) -> Optional[Actor]:
+        return self.engine.game_map.get_actor_at_location(*self.dest_xy)
+
+    @property
+    def target_actor(self):
+        return self.engine.game_map.get_actor_at_location(*self.dest_xy)
 
     def perform(self) -> None:
         raise NotImplementedError()
@@ -53,7 +59,7 @@ class ActionWithDirection(Action):
 
 class BumpAction(ActionWithDirection):
     def perform(self) -> None:
-        if self.blocking_entity:
+        if self.target_actor:
             return MeleeAction(self.entity, self.dx, self.dy).perform()
         else:
             return MovementAction(self.entity, self.dx, self.dy).perform()
@@ -61,14 +67,25 @@ class BumpAction(ActionWithDirection):
 
 class MeleeAction(ActionWithDirection):
     def perform(self) -> None:
-        target = self.blocking_entity
+        target = self.target_actor
         if not target:
             return  # Nothing to attack
 
-        print(f'You brush up against {target.name}, who feels violated.')
+        damage = self.entity.fighter.power - target.fighter.defense
+        attack_desc = f'{self.entity.name.capitalize()} attacks {target.name}'
+        if self.entity is self.engine.player:
+            attack_color = color.player_atk
+        else:
+            attack_color = color.enemy_atk
+
+        if damage > 0:
+            self.engine.message_log.add_message(f'{attack_desc} for {damage} DMG.', attack_color)
+            target.fighter.hp -= damage
+        else:
+            self.engine.message_log.add_message(f'{attack_desc} but frickin\' whiffs!', attack_color)
 
 class MovementAction(ActionWithDirection):
-    def perform(self):
+    def perform(self) -> None:
         dest_x, dest_y = self.dest_xy
 
         if not self.engine.game_map.in_bounds(dest_x, dest_y):
@@ -79,3 +96,7 @@ class MovementAction(ActionWithDirection):
             return
 
         self.entity.move(self.dx, self.dy)
+
+class WaitAction(Action):
+    def perform(self) -> None:
+        pass

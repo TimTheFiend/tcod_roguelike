@@ -2,6 +2,7 @@ import copy
 
 import tcod
 
+import color
 from engine import Engine
 from entity import Entity
 import entity_factory
@@ -41,6 +42,11 @@ def main():
     )
     engine.update_fov()
 
+    engine.message_log.add_message(
+        'You came to the wrong neighborhood, motherfucker',
+        color.welcome_text,
+    )
+
     with tcod.context.new_terminal(
         SCREEN_WIDTH,
         SCREEN_HEIGHT,
@@ -51,8 +57,11 @@ def main():
         root_console = tcod.Console(SCREEN_WIDTH, SCREEN_HEIGHT, order='F')
 
         while True:
-            engine.render(console=root_console, context=context)
-            engine.event_handler.handle_events()
+            root_console.clear()
+            engine.event_handler.on_render(console=root_console)
+            context.present(root_console)
+
+            engine.event_handler.handle_events(context)
 
 if __name__ == '__main__':
     main()

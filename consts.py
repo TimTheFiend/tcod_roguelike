@@ -4,7 +4,7 @@ SCREEN_HEIGHT = 50
 
 # Map data
 MAP_WIDTH = 80
-MAP_HEIGHT = 45
+MAP_HEIGHT = 43
 
 # Room data
 ROOM_MAX_SIZE = 10
