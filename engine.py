@@ -19,12 +19,10 @@ if TYPE_CHECKING:
 class Engine:
     def __init__(
         self,
-        entities: Set[Entity],
         event_handler: EventHandler,
         game_map: GameMap,
         player: Entity,
     ):
-        self.entities = entities
         self.event_handler = event_handler
         self.game_map = game_map
         self.player = player
@@ -39,8 +37,12 @@ class Engine:
                 continue
 
             action.perform(self, self.player)
-
+            self.handle_enemy_turns()
             self.update_fov()
+
+    def handle_enemy_turns(self) -> None:
+        for entity in self.game_map.entities - {self.player}:
+            print(f'{entity.name} thinks about where it all went wrong.')
 
     def update_fov(self):
         """Recompute the visible area based on the player's POV."""
@@ -56,10 +58,5 @@ class Engine:
 
     def render(self, console: Console, context: Context):
         self.game_map.render(console)
-
-        for entity in self.entities:
-            if self.game_map.visible[entity.x, entity.y]:
-                console.print(x=entity.x, y=entity.y, string=entity.char, fg=entity.color)
-
         context.present(console)
         console.clear()

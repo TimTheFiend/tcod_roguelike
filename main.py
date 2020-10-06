@@ -1,8 +1,10 @@
+import copy
+
 import tcod
 
 from engine import Engine
 from entity import Entity
-from game_map import GameMap
+import entity_factory
 from input_handlers import (
     EventHandler,
 )
@@ -15,7 +17,8 @@ from consts import (
     MAP_HEIGHT,
     ROOM_MAX_SIZE,
     ROOM_MIN_SIZE,
-    ROOM_MAX_ROOMS
+    ROOM_MAX_ROOMS,
+    ROOM_MAX_MONSTERS_PER_ROOM,
 )
 
 def main():
@@ -28,9 +31,7 @@ def main():
 
     event_handler = EventHandler()
 
-    player = Entity(x=int(SCREEN_WIDTH / 2), y=int(SCREEN_HEIGHT / 2), char='@', color=(255, 255, 255))
-    npc = Entity(x=int(SCREEN_WIDTH / 2 - 5), y=int(SCREEN_HEIGHT / 2 - 5), char='☺', color=(255,255,0))
-    entities = {npc, player}
+    player = copy.deepcopy(entity_factory.player)
 
     game_map = generate_dungeon(
         map_width=MAP_WIDTH,
@@ -38,11 +39,11 @@ def main():
         max_rooms=ROOM_MAX_ROOMS,
         room_max_size=ROOM_MAX_SIZE,
         room_min_size=ROOM_MIN_SIZE,
+        max_monsters_per_room=ROOM_MAX_MONSTERS_PER_ROOM,
         player=player,
     )
 
     engine = Engine(
-        entities=entities,
         event_handler=event_handler,
         game_map=game_map,
         player=player,

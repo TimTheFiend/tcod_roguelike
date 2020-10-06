@@ -20,16 +20,36 @@ class EscapeAction(Action):
     def perform(self, engine: Engine, entity: Entity):
         raise SystemExit(0)
 
-
-
-class MovementAction(Action):
-    def __init__(self, destination_x: int, destination_y: int):
+class ActionWithDirection(Action):
+    def __init__(self, dx: int, dy: int):
         super().__init__()
+        self.dx = dx
+        self.dy = dy
 
-        self.dx = destination_x
-        self.dy = destination_y
+    def perform(self, engine: Engine, entity: Entity) -> None:
+        raise NotImplementedError()
 
+class BumpAction(ActionWithDirection):
+    def perform(self, engine: Engine, entity: Entity) -> None:
+        dest_x = entity.x + self.dx
+        dest_y = entity.y + self.dy
 
+        if engine.game_map.get_blocking_entity_at_location(dest_x, dest_y):
+            return MeleeAction(self.dx, self.dy).perform(engine, entity)
+        else:
+            return MovementAction(self.dx, self.dy).perform(engine, entity)
+
+class MeleeAction(ActionWithDirection):
+    def perform(self, engine: Engine, entity: Entity) -> None:
+        dest_x = entity.x + self.dx
+        dest_y = entity.y + self.dy
+        target = engine.game_map.get_blocking_entity_at_location(dest_x, dest_y)
+        if not target:
+            return  # Nothing to attack
+
+        print(f'You brush up against {target.name}, who feels violated.')
+
+class MovementAction(ActionWithDirection):
     def perform(self, engine: Engine, entity: Entity):
         dest_x = entity.x + self.dx
         dest_y = entity.y + self.dy
@@ -38,5 +58,7 @@ class MovementAction(Action):
             return  # Destination is not in bounds
         if not engine.game_map.tiles['walkable'][dest_x, dest_y]:
             return  # Destination is not walkable
+        if engine.game_map.get_blocking_entity_at_location(dest_x, dest_y):
+            return
 
         entity.move(dest_x=dest_x, dest_y=dest_y)
