@@ -2,16 +2,17 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from tcod.context import Context
+
 from tcod.console import Console
 from tcod.map import compute_fov
 from tcod import FOV_DIAMOND
 
+import exceptions
 from input_handlers import MainGameEventHandler
 from message_log import MessageLog
 from render_functions import (
-render_bar,
-render_names_at_mouse_location,
+    render_bar,
+    render_names_at_mouse_location,
 )
 
 if TYPE_CHECKING:
@@ -34,7 +35,10 @@ class Engine:
     def handle_enemy_turns(self) -> None:
         for entity in set(self.game_map.actors) - {self.player}:
             if entity.ai:
-                entity.ai.perform()
+                try:
+                    entity.ai.perform()
+                except exceptions.Impossible:
+                    pass
 
 
     def update_fov(self):

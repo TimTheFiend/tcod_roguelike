@@ -79,9 +79,13 @@ def place_entities(
         room: RectangularRoom,
         dungeon: GameMap,
         max_monsters: int,
+        max_items: int,
 ) -> None:
     """Attempts to place entity randomly in a room, if there's not entity in the randomly chosen position."""
-    for i in range(max_monsters):
+    number_of_monsters = rng.randint(0, max_monsters)
+    number_of_items = rng.randint(0, max_items)
+
+    for i in range(number_of_monsters):
         x = rng.randint(room.x1 + 1, room.x2 - 1)
         y = rng.randint(room.y1 + 1, room.y2 - 1)
 
@@ -91,6 +95,20 @@ def place_entities(
             else:
                 entity_factory.troll.spawn(dungeon, x, y)
 
+    for i in range(number_of_items):
+        x = rng.randint(room.x1 + 1, room.x2 - 1)
+        y = rng.randint(room.y1 + 1, room.y2 - 1)
+
+        if not any(entity.x == x and entity.y == y for entity in dungeon.entities):
+            item_chance = rng.random()
+            if item_chance < 0.7:
+                entity_factory.health_potion.spawn(dungeon, x, y)
+            elif item_chance < 0.8:
+                entity_factory.fireball_scroll.spawn(dungeon, x, y)
+            elif item_chance < 0.9:
+                entity_factory.confusion_scroll.spawn(dungeon, x, y)
+            else:
+                entity_factory.lightning_scroll.spawn(dungeon, x, y)
 
 def generate_dungeon(
         *,
@@ -100,6 +118,7 @@ def generate_dungeon(
         room_min_size: int,
         room_max_size: int,
         max_monsters_per_room: int,
+        max_items_per_room: int,
         engine: Engine,
 ) -> GameMap:
     player = engine.player
@@ -128,7 +147,7 @@ def generate_dungeon(
             for x, y in tunnel_between(rooms[-1].center, new_room.center):
                 dungeon.tiles[x, y] = tile_types.floor
 
-        place_entities(new_room, dungeon, max_monsters_per_room)
+        place_entities(new_room, dungeon, max_monsters_per_room, max_items_per_room)
 
         rooms.append(new_room)
     return dungeon

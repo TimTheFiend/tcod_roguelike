@@ -1,12 +1,14 @@
 from __future__ import annotations
 
-from typing import List, Tuple, TYPE_CHECKING
+import random
+from typing import List, Optional, Tuple, TYPE_CHECKING
 
 import numpy as np
 import tcod
 
 from actions import (
     Action,
+    BumpAction,
     MeleeAction,
     MovementAction,
     WaitAction,
@@ -43,6 +45,44 @@ class BaseAI(Action):
         # Compute the path to the destination, and remove the starting position
         path: List[List[int]] = pathfinder.path_to((dest_x, dest_y))[1:].tolist()
         return [(index[0], index[1]) for index in path]
+
+
+class ConfusedEnemy(BaseAI):
+    """
+    A confused enemy will stumble around aimlessly for a given number of turns, then revert back.
+    If an actor occupies a tile it is randomly moving into, it will attack.
+    """
+    def __init__(self, entity: Actor, previous_ai: Optional[BaseAI], turns_remaining: int):
+        super().__init__(entity)
+
+        self.previous_ai = previous_ai
+        self.turns_remaining = turns_remaining
+
+    def perform(self) -> None:
+        # Revert the AI back to the original state if the effect has run its course
+        if self.turns_remaining <= 0:
+            self.engine.message_log.add_message(
+                f'The {self.entity.name.lower()} is no longer confused.'
+            )
+            self.entity.ai = self.previous_ai
+        else:
+            # Pick a random direction
+            dir_x, dir_y = random.choice(
+                [
+                    (-1, -1),  # Up Left
+                    (0, -1),    # Up
+                    (1, -1),    # Up Right
+                    (-1, 0),    # Left
+                    (1, 0),     # Right
+                    (-1, 1),    # Down Left
+                    (0, 1),     # Down
+                    (1, 1),     # Down Right
+                ]
+            )
+            self.turns_remaining -= 1
+            # The actor will either try to move or attack in the chosen random direction.
+            # Its possible the actor will jump bump into a wall, wasting a turn.
+            return BumpAction(self.entity, dir_x, dir_y).perform()
 
 
 class HostileEnemy(BaseAI):
