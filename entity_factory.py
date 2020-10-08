@@ -2,12 +2,13 @@ from components.ai import HostileEnemy
 from components import consumable
 from components.inventory import Inventory
 from components.fighter import Fighter
+from components.level import Level
 
 from entity import Actor, Item
 
 
 player = Actor(
-    char='@',
+    char='☺',
     color=(255, 255, 255),
     name='Player',
     ai_cls=HostileEnemy,
@@ -17,10 +18,11 @@ player = Actor(
         power=5,
     ),
     inventory=Inventory(capacity=26),
+    level=Level(level_up_base=200),
 )
 
 orc = Actor(
-    char='☺',
+    char='☻',
     color=(63, 127, 63),
     name='Orc',
     ai_cls=HostileEnemy,
@@ -30,11 +32,11 @@ orc = Actor(
         power=3,
     ),
     inventory=Inventory(capacity=0),
-
+    level=Level(xp_given=35),
 )
 
 troll = Actor(
-    char='☺',
+    char='☻',
     color=(48, 138, 135),
     name='Troll',
     ai_cls=HostileEnemy,
@@ -44,7 +46,7 @@ troll = Actor(
         power=4,
     ),
     inventory=Inventory(capacity=0),
-
+    level=Level(xp_given=100),
 )
 
 health_potion = Item(
@@ -55,9 +57,9 @@ health_potion = Item(
 )
 
 lightning_scroll = Item(
-    char='Σ',
+    char='º',
     color=(188, 209, 50),
-    name='Shuriken',
+    name='Lightning Scroll',
     consumable=consumable.LightningDamageConsumable(damage=20, maximum_range=5),
 )
 

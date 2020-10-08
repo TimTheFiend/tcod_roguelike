@@ -18,7 +18,7 @@ def save_game(handler: input_handlers.BaseEventHandler, filename: str) -> None:
 def main():
     print('HELLO')
     tileset = tcod.tileset.load_tilesheet(
-        'Synergy16x16.png',
+        'Aesomatica16x16.png',
         16,
         16,
         tcod.tileset.CHARMAP_CP437,
