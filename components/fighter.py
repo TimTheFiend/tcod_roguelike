@@ -83,7 +83,8 @@ class Fighter(BaseComponent):
         self.parent.blocks_movement = False
         self.parent.ai = None
         self.parent.render_order = RenderOrder.CORPSE
-        self.parent.name = f'remains of {self.parent.name.lower()}'
+        if self.engine.player is not self.parent:
+            self.parent.name = f'remains of {self.parent.name.lower()}'
 
         self.engine.message_log.add_message(death_message, death_message_color)
 

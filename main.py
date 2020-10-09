@@ -4,6 +4,7 @@ import tcod
 
 import color
 import exceptions
+import random
 import input_handlers
 import setup_game
 
@@ -19,6 +20,12 @@ def main():
     print('HELLO')
     tileset = tcod.tileset.load_tilesheet(
         'Aesomatica16x16.png',
+        16,
+        16,
+        tcod.tileset.CHARMAP_CP437,
+    )
+    tileset2 = tcod.tileset.load_tilesheet(
+        r"C:\Users\joak\repos\jap-rogue\res\tileset\Jolly16x16.png",
         16,
         16,
         tcod.tileset.CHARMAP_CP437,
@@ -43,6 +50,10 @@ def main():
                 try:
                     for event in tcod.event.wait():
                         context.convert_event(event)
+                        if random.random() < 0.5:
+                            context.change_tileset(tileset2)
+                        else:
+                            context.change_tileset(tileset)
                         handler = handler.handle_events(event)
                 except Exception:
                     traceback.print_exc()

@@ -11,7 +11,7 @@ from entity import Actor, Item
 player = Actor(
     char='☺',
     color=(255, 255, 255),
-    name='Player',
+    name='Sus',
     ai_cls=HostileEnemy,
     equipment=Equipment(),
     fighter=Fighter(

@@ -203,6 +203,22 @@ def generate_dungeon(
                 dungeon.tiles[x, y] = tile_types.floor
 
             center_of_last_room = new_room.center
+        ## Clunky
+        # ## Attempt to draw nice walls
+        # for y in [new_room.y1, new_room.y2]:
+        #     for x in range(new_room.x1, new_room.x2):
+        #         dungeon.tiles[x, y] = tile_types.horizontal_wall
+        #
+        # for x in [new_room.x1, new_room.x2]:
+        #     for y in range(new_room.y1, new_room.y2):
+        #         dungeon.tiles[x, y] = tile_types.vertical_wall
+        # dungeon.tiles[new_room.x1, new_room.y1] = tile_types.top_left_wall
+        # dungeon.tiles[new_room.x2, new_room.y1] = tile_types.top_right_wall
+        # dungeon.tiles[new_room.x1, new_room.y2] = tile_types.bot_left_wall
+        # dungeon.tiles[new_room.x2, new_room.y2] = tile_types.bot_right_wall
+
+        # dungeon.tiles[new_room.x2] = tile_types.top_right_wall
+
 
         place_entities(new_room, dungeon, engine.game_world.current_floor)
 

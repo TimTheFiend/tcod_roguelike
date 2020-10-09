@@ -1,5 +1,5 @@
 # Screen data
-SCREEN_WIDTH = 80
+SCREEN_WIDTH = 100
 SCREEN_HEIGHT = 50
 
 # Map data
