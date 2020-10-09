@@ -25,10 +25,11 @@ max_monsters_per_floor = [
 
 # Note! Floor_number [(entity, chance)]
 item_chances: Dict[int, List[Tuple[Entity, int]]] = {
-    0: [(entity_factory.health_potion, 35)],
+    0: [(entity_factory.health_potion, 35), (entity_factory.sword, 50)],  # TEMP
+    # 0: [(entity_factory.health_potion, 35)],
     2: [(entity_factory.confusion_scroll, 10)],
-    4: [(entity_factory.lightning_scroll, 25)],
-    6: [(entity_factory.fireball_scroll, 25)],
+    4: [(entity_factory.lightning_scroll, 25), (entity_factory.sword, 5)],
+    6: [(entity_factory.fireball_scroll, 25), (entity_factory.chainmail_armor, 15)],
 }
 
 # Note! As the player descend, the chance of getting trolls increase
